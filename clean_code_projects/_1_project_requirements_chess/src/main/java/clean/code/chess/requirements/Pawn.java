@@ -1,5 +1,9 @@
 package clean.code.chess.requirements;
 
+import java.io.PipedReader;
+
+import static java.lang.Math.abs;
+
 public class Pawn {
 
     private ChessBoard chessBoard;
@@ -44,9 +48,37 @@ public class Pawn {
     }
 
     public void Move(MovementType movementType, int newX, int newY) {
-        throw new UnsupportedOperationException("Need to implement Pawn.Move()") ;
+        if(movementType.equals(MovementType.MOVE) && chessBoard.IsLegalBoardPosition(newX, newY)){
+            if(this.xCoordinate == newX){ //should be on the same column
+               validatePositionAndMovePiece(newX,newY);
+            }
+        }
+        else if(movementType.equals(MovementType.CAPTURE)){
+            if(chessBoard.isInBounds(newX, newY) && !chessBoard.isOccupied(xCoordinate,yCoordinate)){
+                if(abs(this.xCoordinate - newX) == 1){  //should move only 1 column to left or right
+                    validatePositionAndMovePiece(newX,newY);
+                }
+            }
+        }
+
     }
 
+    private void validatePositionAndMovePiece(int newX, int newY){
+        if(this.pieceColor == PieceColor.BLACK){
+            if(this.yCoordinate - newY > 0){
+                Pawn[][] pieces = chessBoard.getPieces();
+                pieces[newX][newY] = null;  //delete piece
+                this.yCoordinate = newY; //move
+            }
+        }
+        else if(this.pieceColor == PieceColor.WHITE){
+            if(this.yCoordinate - newY < 0){
+                Pawn[][] pieces = chessBoard.getPieces();
+                pieces[newX][newY] = null;  //delete piece
+                this.yCoordinate = newY;    //move
+            }
+        }
+    }
     @Override
     public String toString() {
         return CurrentPositionAsString();
